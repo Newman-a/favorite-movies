@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Newman - Peliculas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Estilos específicos para el modal */
+        .movie-modal .modal-content {
+            background-color: #000;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 10px;
+        }
+
+        .movie-modal .modal-header {
+            border-bottom: 1px solid #333;
+            background-color: #111;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .movie-modal .modal-footer {
+            border-top: 1px solid #333;
+            background-color: #111;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .movie-modal .btn-close {
+            filter: invert(1);
+        }
+
+        .movie-modal .modal-body {
+            padding: 20px;
+
+
+        }
+
+        .movie-modal .img-fluid {
+            border-radius: 5px;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+        }
+
+
+        .movie-modal h3 {
+            color: #f8f9fa;
+            border-bottom: 2px solid #dc3545;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .movie-modal p {
+            margin-bottom: 10px;
+            white-space: pre-line;
+        }
+
+        .movie-modal strong {
+            color: #dc3545;
+        }
+
+        /* Diseño responsivo para diferentes tamaños de pantalla */
+        @media (min-width: 992px) {
+            .movie-modal .modal-body .row {
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+            }
+
+            .movie-modal .modal-body .col-md-12.text-center {
+                flex: 0 0 70%;
+                max-width: 30%;
+            }
+
+            .movie-modal .modal-body .col-md-12:not(.text-center) {
+                flex: 0 0 60%;
+                max-width: 60%;
+                padding-left: 20px;
+                font-size: 1.2rem;
+            }
+
+            .movie-modal .img-fluid {
+                max-height: 100%;
+                width: 100%;
+                object-fit: cover;
+            }
+        }
+
+        /* Estilos para móviles */
+        @media (max-width: 991px) {
+            .movie-modal .img-fluid {
+                /* max-height: 300px; */
+                width: 60%;
+                object-fit: cover;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="gallery-title"></i>Mis Películas Favoritas</h1>
+            <p class="lead">Filtro por Genero</p>
+
+            <div class="genre-filter" id="genre-filter">
+                <!-- Los botones de género se generarán dinámicamente con JavaScript -->
+            </div>
+        </div>
+
+        <div class="row" id="movies-container">
+            <!-- Las películas se generarán dinámicamente con JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal para mostrar detalles de la película -->
+    <div class="modal fade movie-modal" id="movieModal" tabindex="-1" aria-labelledby="movieModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-xl modal-dialog-centered"> <!-- Modal extra grande en desktop -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="movieModalLabel">Detalles de la Película</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 text-center mb-3">
+                            <img id="modalImage" src="" class="img-fluid" alt="Portada de la película">
+                        </div>
+                        <div class="col-md-12">
+                            <h3 id="modalTitle" class="text-center"></h3>
+                            <p><strong>Género:</strong> <span id="modalGenre"></span></p>
+                            <p><strong>Año:</strong> <span id="modalYear"></span></p>
+                            <p><strong>Calificación:</strong> <span id="modalRating"></span></p>
+                            <p><strong>Descripción:</strong> <br><span id="modalDescription"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elemento de audio para reproducir música (oculto) -->
+    <audio id="movieAudio" volume="0.4"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Datos de las películas en formato JSON
+        const moviesData = [
+            {
+                title: "Inmortales",
+                year: 2011,
+                genre: "Mitologia Griega",
+                rating: 9.2,
+                image: "img/movies/inmortales.webp",
+                description: ` En los albores de un mundo forjado en la sangre de los dioses, el despiadado Rey Hiperión, consumido por una sed de poder tan antigua como el Caos, ha desatado una guerra de exterminio contra la humanidad. Con un ejército de bárbaros sedientos de sangre, cuyas almas han sido mutiladas tanto como sus rostros, el tirano avanza como una plaga de acero, dejando un rastro de cenizas a través de Grecia.
+                
+                Pero su objetivo final no es solo la conquista, sino la aniquilación de los dioses inmortales. Para lograrlo, Hiperión persigue el artefacto más temido del Olimpo: el legendario arco de Epiro, forjado por el mismísimo dios de la guerra, Ares. Con esa arma en sus manos, ningún poder, mortal o divino, podrá detenerlo.
+                
+                El destino del universo pende de un hilo, y en esta era de desesperación, solo un héroe inesperado se levantará de la oscuridad para desafiar al tirano. El futuro de la humanidad yace en la punta de la espada de Teseo, un simple mortal elegido por los cielos para detener a un rey loco y evitar que la tierra se convierta en un infierno eterno
+                `,
+                music: "music/War-in-the-Heavens.mp3"
+            },
+            {
+                title: "300",
+                year: 2006,
+                genre: "Mitologia Griega",
+                rating: 9.0,
+                image: "img/movies/300.webp",
+                description: `En el año 480 a.C., la antigua Grecia se enfrenta a una sombra colosal, una marea de opresión que se alza desde el este. El implacable Rey Jerjes, un dios-rey que se cree invencible, ha desatado el vasto poder del Imperio Persa para someter a todas las naciones bajo su yugo. Un ejército que es un océano de hombres, monstruos y bestias avanza para ahogar la libertad de Occidente.
+
+                Pero en la angosta garganta conocida como las Termópilas, la última esperanza de la civilización se alza. No es un ejército, sino un puñado de hombres forjados en el rigor de la batalla. El Rey Leónidas de Esparta, con solo **300 de sus guerreros más feroces**, se planta en ese desfiladero. Con sus escudos de bronce y sus lanzas de hierro, estos héroes no luchan por la victoria, sino para comprar tiempo.
+
+                Su batalla es un grito de desafío contra la tiranía, un último y glorioso acto de sacrificio que resuena a través del tiempo. Los 300 de Esparta demuestran que el verdadero poder no reside en el número, sino en la férrea voluntad de un corazón indomable y en el espíritu inquebrantable de la libertad.`,
+                music: "music/300.mp3"
+            },
+            {
+                title: "300: El Nacimiento de un Imperio",
+                year: 2014,
+                genre: "Mitologia Griega",
+                rating: 8.7,
+                image: "img/movies/300-2.webp",
+                description: `Mientras los 300 de Esparta caían en las Termópilas, su legendario sacrificio encendió una llama de venganza en el corazón de Grecia. El tirano persa Jerjes, creyéndose invencible, avanza con su ejército para consumir el mundo heleno, pero la verdadera amenaza se esconde en el mar. Artemisia, la implacable comandante de la armada persa, es tan brillante como cruel, y busca vengar a su pueblo y aplastar a los griegos de una vez por todas.
+
+                El general ateniense Temístocles, un estratega audaz y la última esperanza de Grecia, debe unir a las ciudades-estado, unidas solo por su mutuo odio. Con una flota en desventaja numérica, Temístocles se enfrenta en una serie de batallas navales donde la inteligencia y la táctica deben superar la fuerza bruta.
+
+                La sangre de los 300 inspira a los griegos a la guerra. En este choque de titanes, Temístocles debe desafiar no solo a la armada persa, sino también a la misma Artemisia, en una lucha por el dominio del mar y el alma de la civilización occidental.`,
+                music: "music/300-2.mp3"
+            },
+            {
+                title: "Furia de Titanes",
+                year: 2010,
+                genre: "Mitologia Griega",
+                rating: 8.9,
+                image: "img/movies/furia-de-titanes.webp",
+                description: `En los cielos, la guerra de los dioses ha vuelto a encenderse, y sus reverberaciones de poder y rencor amenazan con desatar el infierno sobre la Tierra. El destino de la humanidad pende de la lucha de egos divinos, pero un hombre se atreve a desafiar al destino. Su nombre es Perseo, nacido de un dios, pero criado como un mortal, atormentado por la pérdida de su familia a manos del vengativo dios del inframundo, Hades.
+
+                Sin nada que perder y con un corazón lleno de furia, Perseo abandona su vida terrenal y se embarca en una odisea de proporciones míticas. Lidera a un grupo de guerreros desesperados a través de mundos desconocidos, enfrentándose a bestias colosales y demonios ancestrales. Su misión es clara: evitar que Hades arrebate el trono de Zeus y consuma a la Tierra en la oscuridad.
+
+                El camino de Perseo lo llevará a un encuentro con la mortífera Medusa, a la caza de la monstruosa Quimera y, finalmente, a un enfrentamiento con la criatura más temida del Olimpo: el legendario Kraken. En esta batalla de titanes, el semi-dios debe abrazar su verdadero linaje y forjar su propio destino. El futuro de dioses y hombres recae sobre los hombros de un héroe que, en su desesperación, ha encontrado la fuerza para desafiar al destino.`,
+                music: "music/furia-de-titanes.mp3"
+            },
+            {
+                title: "Furia de Titanes 2",
+                year: 2012,
+                genre: "Mitologia Griega",
+                rating: 8.8,
+                image: "img/movies/furia-de-titanes-2.webp",
+                description: `Una década ha pasado desde que Perseo, el semidiós, derrotó al monstruoso Kraken, salvando a la humanidad y desafiando a los dioses. Ahora, vive una vida humilde como pescador, intentando dejar atrás su linaje divino y criar a su hijo. Pero la paz no es más que una ilusión. En el Olimpo, los dioses pierden su poder y sus fuerzas se desvanecen ante la falta de devoción humana, lo que debilita las paredes del Tártaro, la prisión de los antiguos Titanes.
+
+                El primer en escapar es el traicionero Hades, que, unido al vengativo Ares, traiciona a su padre, Zeus, y lo encierra. El mundo se sumerge de nuevo en el caos, y los Titanes, liderados por el dios-padre Cronos, se alzan para dominar la Tierra una vez más.
+
+                Obligado a abandonar su vida de mortal, Perseo debe unirse a la reina Andrómeda, el semidiós Agenor y el dios caído Hefesto para adentrarse en las profundidades del inframundo. Su misión: liberar a Zeus, restaurar el equilibrio entre los dioses y los hombres, y evitar que el temible Cronos consuma el mundo en su furia. Con la espada en una mano y su fe en la otra, Perseo deberá luchar contra hordas de criaturas míticas y enfrentarse al mismísimo tiempo para salvar a su padre y a la humanidad.`,
+                music: "music/furia-de-titanes-2.mp3"
+            },
+            {
+                title: "Legion de Angeles",
+                year: 2010,
+                genre: "Terror",
+                rating: 8.5,
+                image: "img/movies/legion.webp",
+                description: `Cuando la fe se desvanece y la humanidad se condena a sí misma, Dios ha perdido la paciencia. Desde los cielos, un diluvio de ángeles caídos se precipita sobre la Tierra, no con gloria, sino con una furia purificadora, un juicio final para una especie que ha olvidado su propósito. La única esperanza reside en un grupo de extraños en una remota cafetería de carretera, donde el arcángel Miguel ha desafiado la voluntad divina.
+
+                Despojado de sus alas, Miguel se convierte en el último protector de la humanidad. Su misión: custodiar a una mujer embarazada, cuyo hijo nonato es la clave para la salvación o la destrucción total. El apocalipsis se desata a su alrededor mientras la horda celestial, poseída por un inquebrantable deseo de aniquilación, asalta el único refugio que queda.
+
+                En este bastión de la desesperación, la batalla por la supervivencia y el futuro del mundo se libra. No es solo una lucha entre el bien y el mal, sino un conflicto de fe contra el destino, donde los mortales deben unirse para defender la última chispa de esperanza antes de que la humanidad sea borrada para siempre por la furia de los cielos.`,
+                music: "music/legion.mp3"
+            },
+            {
+                title: "La niebla",
+                year: 2007,
+                genre: "Terror",
+                rating: 8.6,
+                image: "img/movies/laNiebla.webp",
+                description: `En los plácidos confines de un pequeño pueblo de Maine, el velo de la normalidad se desgarra tras una tormenta. De las montañas se alza un banco de niebla sobrenatural que no solo cubre la tierra, sino que oculta un horror indescriptible, una amenaza que se arrastra desde los rincones más oscuros de la imaginación. Atrapados en el interior de un supermercado, un grupo de supervivientes, liderados por el artista David Drayton, se ve obligado a librar una guerra desesperada.
+
+                Pero la niebla no es el único monstruo. A medida que la fe y la razón se desvanecen, la histeria colectiva desata el caos entre los mismos humanos. Las almas se revelan en su forma más brutal y fanática, y la lucha por la supervivencia se convierte en una batalla contra la locura, el miedo y las bestias que acechan en las sombras. En este apocalipsis repentino, los verdaderos horrores no son solo los que se esconden en la bruma, sino los que emergen del corazón humano.`,
+                music: "music/laNiebla.mp3"
+            },
+            {
+                title: "Al filo del mañana",
+                year: 2014,
+                genre: "Ciencia Ficcion",
+                rating: 9.1,
+                image: "img/movies/al-filo.webp",
+                description: `En un futuro cercano, la Tierra ha sido invadida por una fuerza alienígena implacable y destructiva conocida como los Mímicos. Su avance es imparable y la humanidad se enfrenta a una aniquilación segura. En medio de esta guerra total, un cobarde oficial de relaciones públicas, el Mayor William Cage, es arrojado sin experiencia al fragor de la batalla. Sin entrenamiento ni valor, Cage muere en los primeros minutos del combate, pero su muerte no es el final.
+
+                Al caer, Cage se empapa de la sangre de un Mímico alfa y queda atrapado en un bucle temporal, reviviendo el mismo día una y otra vez. Cada muerte, cada derrota, cada agonía le enseña una nueva lección. Con la ayuda de la legendaria heroína de guerra Rita Vrataski, la "Ángel de Verdun", Cage comienza una odisea de miles de batallas, muriendo y resucitando en un ciclo sin fin para perfeccionar cada movimiento, cada estrategia, cada táctica.
+
+                Esta es una guerra no solo por la supervivencia de la humanidad, sino una lucha contra el tiempo mismo. Cage debe aprovechar la oportunidad de cada nuevo amanecer para convertirse en el guerrero que necesita ser, el único hombre capaz de cambiar el destino de la Tierra y romper el ciclo mortal que lo aprisiona.`,
+                music: "music/al-filo.mp3"
+            },
+            {
+                title: "Sector 9",
+                year: 2009,
+                genre: "Ciencia Ficcion",
+                rating: 9.0,
+                image: "img/movies/sector-9.webp",
+                description: `Hace más de dos décadas, una nave alienígena gigante se detuvo sobre Johannesburgo. Pero en lugar de la guerra o el avance tecnológico, la humanidad encontró a un millón de criaturas desnutridas y abandonadas. Confinados en un campo de refugiados apodado "Sector 9", los extraterrestres, con el tiempo, se convierten en parias, forzados a vivir en la miseria y el desprecio.
+
+                El gobierno, cediendo a la presión pública, contrata a un burócrata llamado Wikus van de Merwe para liderar una reubicación forzada. Pero durante la operación, un accidente con un misterioso fluido alienígena lo condena. Su ADN comienza a mutar, transformándolo poco a poco en una de las mismas criaturas que despreciaba.
+
+                Perseguido por las autoridades y por su propia gente, Wikus se convierte en un fugitivo y se ve obligado a buscar refugio en el mismo sector que una vez oprimió. Despojado de su humanidad, descubre un nuevo propósito y una verdad escalofriante sobre los alienígenas y la conspiración en su contra. Su lucha por la supervivencia se convierte en una batalla por la redención, un clamor por la justicia en un mundo que ha perdido su alma, y un recordatorio de que a veces, el verdadero monstruo no es el que viene de otro planeta.`,
+                music: "music/sector-9.mp3"
+            },
+            {
+                title: "Tenet",
+                year: 2020,
+                genre: "Ciencia Ficcion",
+                rating: 8.9,
+                image: "img/movies/Tenet.webp",
+                description: `En un mundo al borde del apocalipsis, donde la guerra ya no se libra en el tiempo lineal, un agente anónimo conocido simplemente como el Protagonista se enfrenta a una misión que va más allá de la comprensión humana. Reclutado por una organización secreta llamada Tenet, su único objetivo es evitar una Tercera Guerra Mundial, no con armas, sino con un concepto más devastador: la inversión.
+
+                Su enemigo no es un hombre, sino un oligarca ruso con la capacidad de manipular la entropía, invirtiendo el flujo del tiempo para que los futuros conflictos ya hayan sido enviados al pasado. El Protagonista debe navegar por un laberinto de secretos, intrigas y paradojas temporales, aprendiendo a luchar, a conducir y a vivir en un universo donde las balas se devuelven al cañón y las explosiones se rebobinan.
+
+                El destino del mundo depende de que él comprenda la intrincada red de sucesos y manipule el tiempo para detener una catástrofe que aún no ha ocurrido. Esta es una guerra de conocimiento, una carrera contra el reloj donde el pasado y el futuro colisionan, y solo los que comprenden la inversión pueden sobrevivir.`,
+                music: "music/tenet.mp3"
+            },
+            {
+                title: "Origen",
+                year: 2010,
+                genre: "Ciencia Ficcion",
+                rating: 9.3,
+                image: "img/movies/inception.webp",
+                description: `Dom Cobb es un ladrón con una habilidad extraordinaria: puede entrar en los sueños de las personas y robar sus secretos más profundos desde lo más profundo de su subconsciente. Esta habilidad lo ha convertido en un codiciado jugador en el mundo del espionaje corporativo, pero también lo ha convertido en un fugitivo internacional y le ha costado todo lo que amaba.
+
+                Ahora, se le ofrece una oportunidad única para redimirse. En lugar de robar una idea, debe implantar una: la tarea aparentemente imposible de "origen". Si tiene éxito, será el crimen perfecto, pero un enemigo inesperado amenaza con frustrar su misión y destruirlo a él y a su equipo.
+
+                Para lograrlo, Cobb reúne a un equipo de especialistas y juntos se embarcan en una misión que los llevará a través de múltiples niveles de sueños dentro de sueños. A medida que la línea entre la realidad y la ilusión se difumina, Cobb debe confrontar sus propios demonios internos y decidir qué es real y qué es solo una construcción de su mente. En este viaje a través del subconsciente, la mente humana se convierte en el campo de batalla más peligroso y fascinante.`,
+                music: "music/el-origen.mp3"
+            },
+            {
+                title: "Interestelar",
+                year: 2014,
+                genre: "Ciencia Ficcion",
+                rating: 9.4,
+                image: "img/movies/interestelar.webp",
+                description: `Cuando la Tierra se asfixia bajo el peso de un futuro en decadencia, consumida por plagas y tormentas de polvo, la esperanza de la humanidad no yace en el planeta, sino en las estrellas. Un antiguo astronauta y piloto, Cooper, vive una vida de granjero, obligado a ver cómo el mundo que conocía se desvanece lentamente. Pero un misterioso evento lo lleva a una base secreta de la NASA, donde la única misión viable es la más desesperada de todas: adentrarse en la oscuridad del espacio profundo a través de un agujero de gusano.
+
+                Cooper y su tripulación, los últimos exploradores de la humanidad, deben embarcarse en un viaje a través de la galaxia en busca de un nuevo hogar. Enfrentan la relatividad del tiempo, donde cada hora en un planeta significa décadas en la Tierra, y el riesgo de quedar atrapados en la inmensidad del espacio. En su odisea a través de la gravedad, los agujeros negros y dimensiones inimaginables, Cooper debe tomar decisiones que lo obligan a elegir entre salvar a su propia familia y asegurar el futuro de toda la especie humana.
+
+                Este es un viaje al borde del conocimiento y de la emoción, una batalla por la supervivencia que se libra en las fronteras de la ciencia y el corazón.`,
+                music: "music/Interestelar.mp3"
+            },
+            {
+                title: "Harry Potter y la piedra filosofal",
+                year: 2001,
+                genre: "Fantasia",
+                rating: 9.0,
+                image: "img/movies/harry-potter-1.webp",
+                description: `En un mundo oculto del de los mortales, un universo de magia, castillos ancestrales y criaturas fantásticas, un niño huérfano y maltratado llamado Harry Potter descubre que su vida no ha sido más que una mentira. Justo antes de cumplir los once años, una marea de misteriosas cartas lo alcanza y revela la verdad: es un mago, destinado a asistir a Hogwarts, la legendaria escuela de magia y hechicería.
+
+                Pero Harry no es un mago ordinario. Es una leyenda viviente, el único superviviente de la maldición asesina de Lord Voldemort, el señor oscuro más temido de todos los tiempos. La cicatriz en su frente es un eco de esa noche fatídica.
+
+                Al llegar a Hogwarts, Harry se adentra en un reino de maravillas y secretos, forja amistades inquebrantables con Ron Weasley y Hermione Granger, y comienza a dominar los misterios de su poder. Sin embargo, una sombra acecha en los pasillos de piedra. Un antiguo mal, que se creía derrotado, busca el objeto más poderoso y codiciado: la piedra filosofal, capaz de otorgar la inmortalidad. Harry, con sus nuevos amigos, debe enfrentarse a desafíos mortales y a un enemigo que se oculta en las sombras, en una batalla por su propia vida y por el futuro del mundo mágico.`,
+                music: "music/harry-potter-1.mp3"
+            },
+            {
+                title: "El Señor de los Anillos: La Comunidad del Anillo",
+                year: 2001,
+                genre: "Fantasia",
+                rating: 9.5,
+                image: "img/movies/anillo-1.webp",
+                description: `En los plácidos parajes de la Comarca, un mundo de paz y verdor, el hobbit Frodo Bolsón hereda un simple anillo de su tío Bilbo. Pero este no es un tesoro, sino el Anillo Único, un artefacto de poder oscuro y voluntad maligna forjado hace milenios por el Señor Oscuro Sauron. Con él, Sauron puede dominar a todas las razas de la Tierra Media y sumirla en una noche eterna.
+
+                El viejo y sabio mago Gandalf descubre la verdad, y le revela a Frodo el peso de su destino. La única forma de salvar el mundo es destruir el Anillo en el mismo lugar donde fue creado: los fuegos del Monte del Destino en las profundidades de Mordor, la tierra de Sauron.
+
+                Con un camino plagado de peligros inimaginables, Frodo no emprende su viaje solo. A él se le une una variopinta comunidad de héroes de las diferentes razas: el leal hobbit Sam, el sabio elfo Legolas, el indomable enano Gimli, los valientes hombres Boromir y Aragorn, y los fieles hobbits Merry y Pippin. Juntos, esta Comunidad del Anillo se enfrenta a una odisea a través de bosques antiguos, minas abandonadas y montañas nevadas, enfrentándose a orcos, monstruos y a la sombra creciente de una oscuridad que no conoce la piedad.
+
+                Esta es la historia del viaje de un pequeño héroe, un camino de sacrificio y valor que determinará el destino de toda la Tierra Media.`,
+                music: "music/anillo.mp3"
+            },
+            {
+                title: "Transformers",
+                year: 2007,
+                genre: "Ciencia Ficcion",
+                rating: 8.4,
+                image: "img/movies/transformers.webp",
+                description: `En los confines del universo, una guerra milenaria ha devastado el planeta de los robots, Cybertron. Dos facciones, los nobles Autobots y los despiadados Decepticons, luchan por el control del Cubo Cósmico, el AllSpark, una reliquia de poder inimaginable que puede crear o destruir la vida. Para protegerla, el líder de los Autobots, Optimus Prime, la arroja al vacío del espacio, un acto desesperado que la envía a chocar con un planeta lejano: la Tierra.
+
+                Años después, la guerra se traslada a nuestro mundo. El joven Sam Witwicky, un simple estudiante, adquiere un auto de segunda mano que es, sin que él lo sepa, un valiente Autobot explorador. Pronto, Sam se ve inmerso en un conflicto intergaláctico, descubriendo que sus ancestros tienen la clave para encontrar el AllSpark, una clave que los Decepticons, liderados por el malvado Megatron, también persiguen.
+
+                El destino de la humanidad pende de la capacidad de Sam para ayudar a los Autobots a encontrar el Cubo antes de que Megatron lo use para esclavizar a la raza humana. Es una batalla donde los titanes de metal luchan por la libertad en medio de la destrucción de las ciudades humanas, un enfrentamiento donde la supervivencia de toda una civilización depende de un joven y sus nuevos amigos robóticos.`,
+                music: "music/transformers.mp3"
+            },
+            {
+                title: "Ready Player One: Comienza el Juego",
+                year: 2018,
+                genre: "Ciencia Ficcion",
+                rating: 8.7,
+                image: "img/movies/readyplayone.webp",
+                description: `En el año 2045, el mundo real es un lugar sombrío y superpoblado. La única vía de escape, la única esperanza de la humanidad, reside en OASIS, un vasto y utópico universo de realidad virtual creado por el genio excéntrico James Halliday. Pero cuando Halliday muere, deja un legado final: un tesoro oculto, un "huevo de Pascua" digital que, al ser encontrado, le dará a su descubridor el control total de OASIS y una inmensa fortuna.
+
+                El joven Wade Watts, un huérfano que vive en la miseria, se lanza a la búsqueda con su avatar, Parzival. No está solo. Compite contra legiones de "gunters" (cazadores de huevos) y, lo que es peor, contra la gigantesca y despiadada corporación IOI, que busca comercializar OASIS y convertirlo en un monopolio.
+
+                Con la ayuda de sus amigos, el intrépido grupo conocido como los Cinco Grandes, Wade debe descifrar los acertijos de Halliday, una serie de pruebas basadas en la cultura pop de los años 80, mientras lucha en el mundo digital y en el mundo real contra un enemigo que no se detendrá ante nada. Es una odisea a través de universos virtuales, donde los héroes de la cultura pop luchan por la libertad y el destino del mundo pende del resultado de una cacería de tesoro.`,
+                music: "music/readyplayone.mp3"
+            }
+
+        ];
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const moviesContainer = document.getElementById('movies-container');
+            const genreFilter = document.getElementById('genre-filter');
+            const movieModal = new bootstrap.Modal(document.getElementById('movieModal'));
+            const audioElement = document.getElementById('movieAudio');
+
+            // Extraer todos los géneros únicos
+            const allGenres = [...new Set(moviesData.map(movie => movie.genre))];
+
+            // Crear botones de filtro
+            createFilterButtons(allGenres);
+
+            // Generar las películas
+            renderMovies(moviesData);
+
+            // Configurar event listeners para los filtros
+            setupFilterListeners();
+
+            // Configurar event listener para cuando se cierra el modal
+            document.getElementById('movieModal').addEventListener('hidden.bs.modal', function () {
+                // Detener la música cuando se cierra el modal
+                audioElement.pause();
+                audioElement.currentTime = 0;
+            });
+
+            function createFilterButtons(genres) {
+                // Botón "Todas"
+                genreFilter.innerHTML = '<button class="btn filter-btn active" data-filter="all">Todas</button>';
+
+                // Botones para cada género
+                genres.forEach(genre => {
+                    const button = document.createElement('button');
+                    button.className = 'btn filter-btn';
+                    button.setAttribute('data-filter', genre);
+                    button.textContent = genre;
+                    genreFilter.appendChild(button);
+                });
+            }
+
+            function renderMovies(movies) {
+                moviesContainer.innerHTML = '';
+
+                movies.forEach((movie, index) => {
+                    const movieElement = document.createElement('div');
+                    movieElement.className = 'col-3 col-md-2 movie-container';
+                    movieElement.setAttribute('data-genre', movie.genre);
+                    movieElement.setAttribute('data-index', index);
+
+                    movieElement.innerHTML = `
+                        <div class="movie-image" style="background-image: url('${movie.image}');">
+                            <div class="movie-rating"><i class="fas fa-star me-1"></i>${movie.rating}</div>
+                        </div>
+                        <div class="movie-info">
+                            <div class="movie-title">${movie.title}</div>
+                            <div class="movie-year">${movie.year} · ${movie.genre}</div>
+                        </div>
+                    `;
+
+                    // Agregar evento de clic para abrir el modal
+                    movieElement.addEventListener('click', function () {
+                        openMovieModal(index);
+                    });
+
+                    moviesContainer.appendChild(movieElement);
+                });
+            }
+
+            function openMovieModal(index) {
+                const movie = moviesData[index];
+
+                // Llenar el modal con los datos de la película
+                document.getElementById('modalImage').src = movie.image;
+                document.getElementById('modalTitle').textContent = movie.title;
+                document.getElementById('modalGenre').textContent = movie.genre;
+                document.getElementById('modalYear').textContent = movie.year;
+                document.getElementById('modalRating').textContent = movie.rating;
+                document.getElementById('modalDescription').textContent = movie.description;
+                // document.getElementById('movieModalLabel').textContent = movie.title;
+                document.getElementById('movieModalLabel').textContent = '';
+
+                // Configurar y reproducir la música
+                audioElement.src = movie.music;
+                audioElement.volume = 0.4; // 60% de volumen
+                audioElement.play().catch(e => {
+                    console.log("La reproducción automática fue prevenida: ", e);
+                });
+
+                // Mostrar el modal
+                movieModal.show();
+            }
+
+            function setupFilterListeners() {
+                const filterButtons = document.querySelectorAll('.filter-btn');
+                const movies = document.querySelectorAll('.movie-container');
+
+                filterButtons.forEach(button => {
+                    button.addEventListener('click', function () {
+                        // Remover la clase active de todos los botones
+                        filterButtons.forEach(btn => btn.classList.remove('active'));
+
+                        // Agregar la clase active al botón clickeado
+                        this.classList.add('active');
+
+                        // Obtener el valor del filtro
+                        const filterValue = this.getAttribute('data-filter');
+
+                        // Filtrar las películas
+                        movies.forEach(movie => {
+                            const movieGenre = movie.getAttribute('data-genre');
+
+                            if (filterValue === 'all' || movieGenre === filterValue) {
+                                movie.style.display = 'block';
+                            } else {
+                                movie.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
